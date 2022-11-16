@@ -25,7 +25,7 @@ class NGame(Env):
         # Define extraction parameters for the game
         self.cap = mss()
         # Change these
-        self.game_location = {'top': 300, 'left': 500, 'width': 500, 'height': 500}
+        self.game_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
         self.finish_location = {'top': 405, 'left': 630, 'width': 660, 'height': 70}
 
     # What is called to perform an action in the game
