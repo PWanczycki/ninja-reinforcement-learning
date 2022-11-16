@@ -21,8 +21,8 @@ class NGame(Env):
         super().__init__()
         # setup spaces
         self.observation_space = Box(low=0, high=255, shape=(1, 83, 100), dtype=np.uint8)
-        # 3 actions: 0 = jump, 1 = left, 2 = right, 3 = no action
-        self.action_space = Discrete(4)
+        # 5 actions: 0 = jump, 1 = left, 2 = right, 3 = jump+left, 4 = jump+right, 5 = no action
+        self.action_space = Discrete(6)
         # Define extraction parameters for the game
         self.cap = mss()
         # Change these
@@ -31,7 +31,46 @@ class NGame(Env):
 
     # What is called to perform an action in the game
     def step(self, action):
-        pass
+
+        match action:
+            case 0:
+                # keyDown jump, keyUp left and right
+                pydirectinput.keyUp('left')
+                pydirectinput.keyUp('right')
+                pydirectinput.keyDown('z')
+            case 1:
+                # keyDown left, keyUp jump and right
+                pydirectinput.keyUp('z')
+                pydirectinput.keyUp('right')
+                pydirectinput.keyDown('left')
+            case 2:
+                # keyDown right, keyUp jump and left
+                pydirectinput.keyUp('z')
+                pydirectinput.keyUp('left')
+                pydirectinput.keyDown('right')
+            case 3:
+                # keyDown left and jump, keyUp right
+                pydirectinput.keyUp('right')
+                pydirectinput.keyDown('left')
+                pydirectinput.keyDown('z')
+            case 4:
+                # keyDown right and jump, keyUp left
+                pydirectinput.keyUp('left')
+                pydirectinput.keyDown('right')
+                pydirectinput.keyDown('z')
+            case 5:
+                # keyUp jump, left, and right
+                pydirectinput.keyUp('z')
+                pydirectinput.keyUp('left')
+                pydirectinput.keyUp('right')
+
+        """
+        done, done_cap = self.get_done()
+        observation = self.get_observation()
+        reward = some_reward
+        info = {}
+        return observation, reward, done, info
+        """
 
     # Visualizes the game
     def render(self):
