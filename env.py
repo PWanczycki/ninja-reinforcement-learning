@@ -14,6 +14,7 @@ import time
 from gym import Env
 from gym.spaces import Box, Discrete
 
+
 class NGame(Env):
     # Setup environment action and observation shapes
     def __init__(self):
@@ -58,13 +59,12 @@ class NGame(Env):
 
     def get_finish(self):
         # Get the finished screen
-        finish_cap = np.array(self.cap.grab(self.finish_location))[:,:,:3]
+        finish_cap = np.array(self.cap.grab(self.finish_location))[:, :, :3]
         # We need to capture both the "ouch" = continue and the "game over screen"
-        finish_strings = ['ouch','Game','level']
+        finish_strings = ['ouch', 'Game', 'level']
         return finish_cap
 
 
 env = NGame()
 plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
 plt.show()
-
