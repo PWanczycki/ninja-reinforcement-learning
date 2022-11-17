@@ -34,43 +34,42 @@ class NGame(Env):
 
         match action:
             case 0:
-                # keyDown jump, keyUp left and right
+                # jump
                 pydirectinput.keyUp('left')
                 pydirectinput.keyUp('right')
                 pydirectinput.keyDown('z')
             case 1:
-                # keyDown left, keyUp jump and right
+                # left
                 pydirectinput.keyUp('z')
                 pydirectinput.keyUp('right')
                 pydirectinput.keyDown('left')
             case 2:
-                # keyDown right, keyUp jump and left
+                # right
                 pydirectinput.keyUp('z')
                 pydirectinput.keyUp('left')
                 pydirectinput.keyDown('right')
             case 3:
-                # keyDown left and jump, keyUp right
+                # jump left
                 pydirectinput.keyUp('right')
                 pydirectinput.keyDown('left')
                 pydirectinput.keyDown('z')
             case 4:
-                # keyDown right and jump, keyUp left
+                # jump right
                 pydirectinput.keyUp('left')
                 pydirectinput.keyDown('right')
                 pydirectinput.keyDown('z')
             case 5:
-                # keyUp jump, left, and right
+                # no op
                 pydirectinput.keyUp('z')
                 pydirectinput.keyUp('left')
                 pydirectinput.keyUp('right')
 
-        """
-        done, done_cap = self.get_done()
+        # done, done_cap = self.get_finish()
         observation = self.get_observation()
-        reward = some_reward
+        reward = -1     # placeholder reward
         info = {}
-        return observation, reward, done, info
-        """
+        # return observation, reward, done, info
+        return observation, reward, info
 
     # Visualizes the game
     def render(self):
@@ -78,7 +77,11 @@ class NGame(Env):
 
     # Restarts the game
     def reset(self):
-        pass
+        time.sleep(1)
+        pydirectinput.click(x=500, y=500)
+        # needs different input for actual restart
+        pydirectinput.press('z')
+        return self.get_observation()
 
     def get_observation(self):
         # Get the screen capture of the game
@@ -105,5 +108,18 @@ class NGame(Env):
 
 
 env = NGame()
-plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
-plt.show()
+#plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
+#plt.show()
+
+# input testing
+obs = env.reset()
+total_reward = 0
+for i in range(20):
+    obs, reward, info = env.step(env.action_space.sample())
+    total_reward += reward
+
+# reset keystrokes to avoid holding last action
+pydirectinput.press('z')
+pydirectinput.press('left')
+pydirectinput.press('right')
+print("Total reward is {}".format(total_reward))
