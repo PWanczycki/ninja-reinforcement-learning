@@ -24,9 +24,16 @@ class NGame(Env):
         self.action_space = Discrete(4)
         # Define extraction parameters for the game
         self.cap = mss()
-        # Change these
+        # Captures the game state
         self.game_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
-        self.finish_location = {'top': 405, 'left': 630, 'width': 660, 'height': 70}
+        # Get the complete level message, 'level
+        self.complete_location =  {'top': 294, 'left': 851, 'width': 27, 'height': 12}
+        # Get the game over message, 'game', 'gome'
+        self.finish_location = {'top': 364, 'left': 706, 'width': 35, 'height': 20}
+        # Get the death message, 'ouch'
+        self.death_location = {'top': 284, 'left': 866, 'width': 38, 'height': 30}
+        # Get the start message
+        self.start_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
 
     # What is called to perform an action in the game
     def step(self, action):
@@ -42,7 +49,7 @@ class NGame(Env):
 
     def get_observation(self):
         # Get the screen capture of the game
-        raw = np.array(self.cap.grab(self.game_location))[:, :, :3]
+        raw = np.array(self.cap.grab(self.complete_location))[:, :, :3]
         # Greyscale
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
 
