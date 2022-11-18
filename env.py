@@ -35,10 +35,11 @@ class NGame(Env):
         self.death_location = {'top': 284, 'left': 866, 'width': 38, 'height': 30}
         # Get the start message
         self.start_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
+        # Get the
 
     # What is called to perform an action in the game
     def step(self, action):
-
+        # action maps to corresponding keys pressing down and all other keys going up
         match action:
             case 0:
                 # jump
@@ -118,6 +119,7 @@ env = NGame()
 #plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
 #plt.show()
 
+"""
 # input testing
 obs = env.reset()
 total_reward = 0
@@ -130,3 +132,4 @@ pydirectinput.press('z')
 pydirectinput.press('left')
 pydirectinput.press('right')
 print("Total reward is {}".format(total_reward))
+"""
