@@ -120,8 +120,17 @@ class NGame(Env):
         # needs different input for actual restart
         # if state is timer runs out, press('esc')
         # in all cases:
-        pydirectinput.press('z')
-        pydirectinput.press('z')
+        if state == "DEAD" or state == "LEVEL COMPLETE":
+            pydirectinput.press('z')
+        if state == "GAME OVER":
+            pydirectinput.press('z')
+            pydirectinput.press('z')
+            pydirectinput.press('z')
+        if state == "VICTORY":
+            pydirectinput.press('z')
+            pydirectinput.press('up')
+            pydirectinput.press('z')
+            pydirectinput.press('z')
         # if state is victory (only after stage complete), press('up'), ('z'), ('z')
         return self.get_observation()
 
