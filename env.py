@@ -90,15 +90,20 @@ class NGame(Env):
             if self.check_death():
                 reward = reward-10
                 status = "DEAD"
-            elif self.check_gameover():
-                reward = reward-100
-                status = "GAME OVER"
+                pydirectinput.press('z')
+                time.sleep(1)
+                if self.check_gameover():
+                    reward = reward-100
+                    status = "GAME OVER"
             elif self.check_level_complete():
                 reward = reward + 50
                 status = "LEVEL COMPLETE"
+                pydirectinput.press('z')
+                time.sleep(1)
                 if self.check_victory():
                     reward = reward + 200
                     status = "VICTORY"
+        # if status check does not give reward
         if reward == 0:
             reward = self.get_reward()
 
