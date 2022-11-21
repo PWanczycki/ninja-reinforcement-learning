@@ -14,6 +14,7 @@ import time
 from gym import Env
 from gym.spaces import Box, Discrete
 
+pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Erict\AppData\Local\Tesseract-OCR\tesseract.exe'
 
 class NGame(Env):
     # Setup environment action and observation shapes
@@ -27,16 +28,17 @@ class NGame(Env):
         self.cap = mss()
         # Captures the game state
         self.game_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
-        # Get the complete level message, 'level
-        self.complete_location =  {'top': 294, 'left': 851, 'width': 27, 'height': 12}
-        # Get the game over message, 'game', 'gome'
-        self.finish_location = {'top': 364, 'left': 706, 'width': 35, 'height': 20}
-        # Get the death message, 'ouch'
-        self.death_location = {'top': 284, 'left': 866, 'width': 38, 'height': 30}
-        # Get the start message
-        self.start_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
+
+        # Get the death message, 'ouch...'
+        self.death_location = {'top': 290, 'left': 878, 'width': 40, 'height': 20}
+        # Get the game over message, 'Game Over' i.e. running out of time
+        self.game_over_location = {'top': 361, 'left': 709, 'width': 60, 'height': 31}
+        # Get the complete level message, 'level'
+        self.level_complete_location = {'top': 284, 'left': 851, 'width': 57, 'height': 30}
+        # Get the victory message, episode is completed
+        self.victory_location = {'top': 371, 'left': 695, 'width': 51, 'height': 11}
         # Get the level timer
-        self.timer_location = {'top': 135+68, 'left': 460+69, 'width': 780, 'height': 1}
+        self.timer_location = {'top': 135 + 68, 'left': 460 + 69, 'width': 780, 'height': 1}
 
     # What is called to perform an action in the game
     def step(self, action):
@@ -95,7 +97,7 @@ class NGame(Env):
 
     def get_observation(self):
         # Get the screen capture of the game
-        raw = np.array(self.cap.grab(self.complete_location))[:, :, :3]
+        raw = np.array(self.cap.grab(self.game_location))[:, :, :3]
         # Greyscale
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
 
@@ -109,13 +111,45 @@ class NGame(Env):
     def close_observation(self):
         pass
 
-    def get_finish(self):
-        # Get the finished screen
-        finish_cap = np.array(self.cap.grab(self.finish_location))[:, :, :3]
-        # We need to capture both the "ouch" = continue and the "game over screen"
-        finish_strings = ['ouch', 'Game', 'level']
-        return finish_cap
+    def check_death(self):
+        # Check if the agent is dead
+        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.death_location))[:, :, :3])[:4]
+        strings = ['ouch','oucn']
 
+        status = False
+        if capture in strings:
+            print("Agent has died")
+            status = True
+        return status
+    def check_gameover(self):
+        # Check if the run is over, no more in game time
+        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.game_over_location))[:, :, :3])[:5]
+        strings = ['Gomme', 'Gorne']
+        status = False
+        if capture in strings:
+            print("Game Over!")
+            status = True
+        return status
+
+    def check_level_complete(self):
+        # Check if the level has been beaten
+        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.level_complete_location))[:, :, :3])[:5]
+        strings = ['level', 'laval']
+        status = False
+        if capture in strings:
+            print("Level Complete!")
+            done = True
+        return status
+
+    def check_victory(self):
+        # Check if the episode has been beaten, victory screen
+        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.victory_location))[:, :, :3])[:7]
+        strings = ['VICTORY']
+        status = False
+        if capture in strings:
+            print("Episode Complete!")
+            status = True
+        return status
     def get_reward(self):
         # grab timer screenshot
         timer = np.array(self.cap.grab(self.timer_location))[:, :, :3].tolist()
@@ -143,11 +177,18 @@ class NGame(Env):
         # default negative reward if timer messes up
         return -7
 
-
-
 env = NGame()
-#plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
+img = env.get_observation()
+
+env.check_death()
+env.check_gameover()
+env.check_level_complete()
+env.check_victory()
+
+#plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 #plt.show()
+
+
 
 """
 # input testing
