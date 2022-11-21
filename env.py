@@ -243,15 +243,16 @@ env.check_victory()
 """
 env.get_time()
 
-plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-plt.show()
+#plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+#plt.show()
 
 
 # input testing
 # game states: "RUN", "DEAD", "TIME", "COMPLETE", "VICTORY"
 game_state = "RUN"
-for episode in range(10):
+for episode in range(3):
     obs = env.reset(state=game_state)
+    game_state = "RUN"
     total_reward = 0
     while game_state == "RUN":
         obs, reward, game_state, info = env.step(env.action_space.sample())
