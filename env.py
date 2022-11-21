@@ -35,7 +35,8 @@ class NGame(Env):
         self.death_location = {'top': 284, 'left': 866, 'width': 38, 'height': 30}
         # Get the start message
         self.start_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
-        # Get the
+        # Get the level timer
+        self.timer_location = {'top': 135+68, 'left': 460+69, 'width': 780, 'height': 1}
 
     # What is called to perform an action in the game
     def step(self, action):
@@ -74,7 +75,8 @@ class NGame(Env):
 
         # done, done_cap = self.get_finish()
         observation = self.get_observation()
-        reward = -1     # placeholder reward
+        # if get_finish() does not return reward (level not done)
+        reward = self.get_reward()
         info = {}
         # return observation, reward, done, info
         return observation, reward, info
@@ -113,6 +115,34 @@ class NGame(Env):
         # We need to capture both the "ouch" = continue and the "game over screen"
         finish_strings = ['ouch', 'Game', 'level']
         return finish_cap
+
+    def get_reward(self):
+        # grab timer screenshot
+        timer = np.array(self.cap.grab(self.timer_location))[:, :, :3].tolist()
+
+        PURPLE = [136, 34, 34]
+        GRAY = [136, 121, 121]
+
+        # iterate twice through pixels 60 at a time, (13 positions/blocks)
+        # first iter, stop if middle of block is gray, 7th (middle) block -> reward = 0,
+        # -1 for each earlier block, +1 for each later (-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6)
+        # second iter, stop if dark purple,
+        # same rewards as first iter, but +13 (7,8,9,...,18,19)
+
+        # check for timer <= 180
+        for i in range(13):
+            if timer[0][i * 60 + 30] == GRAY:
+                return i - 6
+
+        # check for timer > 180
+        for i in range(13):
+            # if pixel i*60+30 is purple, return i+7
+            if timer[0][i * 60 + 30] == PURPLE:
+                return i + 7
+
+        # default negative reward if timer messes up
+        return -7
+
 
 
 env = NGame()
