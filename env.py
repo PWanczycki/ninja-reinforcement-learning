@@ -156,7 +156,7 @@ class NGame(Env):
         status = False
         if capture in strings:
             print("Level Complete!")
-            done = True
+            status = True
         return status
 
     def check_victory(self):
@@ -211,9 +211,9 @@ env.check_victory()
 """
 # input testing
 for episode in range(10):
-    obs = env.reset()
-    # game states: "RUN", "DEAD", "TIME", "COMPLETE"
     game_state = "RUN"
+    obs = env.reset(state=game_state)
+    # game states: "RUN", "DEAD", "TIME", "COMPLETE"
     total_reward = 0
     for i in range(50):
         obs, reward, info = env.step(env.action_space.sample())
