@@ -39,7 +39,7 @@ class NGame(Env):
         # Get the victory message, episode is completed
         self.victory_location = {'top': 371, 'left': 695, 'width': 51, 'height': 11}
         # Get the level timer bar
-        self.timerbar_location = {'top': 135 + 68, 'left': 460 + 69, 'width': 780, 'height': 1}
+        self.timerbar_location = {'top': 135 + 45, 'left': 460 + 110, 'width': 780, 'height': 1}
         # Get the level timer number
         self.time_location = {'top': 160, 'left': 500, 'width': 65, 'height': 45}
 
