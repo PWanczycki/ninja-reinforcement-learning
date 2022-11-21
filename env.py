@@ -78,24 +78,42 @@ class NGame(Env):
                 pydirectinput.keyUp('left')
                 pydirectinput.keyUp('right')
 
-        # done, done_cap = self.get_finish()
+        status = "RUN"
         observation = self.get_observation()
-        # if get_finish() does not return reward (level not done)
-        reward = self.get_reward()
         info = {}
-        # return observation, reward, done, info
-        return observation, reward, info
+        reward = 0
+        #if check_death() == True:
+        #    reward = -10
+        #    status = "DEAD"
+        #if reward == 0 and check_outoftime() == True:
+        #    reward = -100
+        #    status = "TIME"
+        #if reward == 0 check_level_complete() == True:
+        #    reward = 50
+        #    status = "LEVEL COMPLETE"
+        #    if check_victory() == True:
+        #        reward = 200
+        #        status = "VICTORY"
+
+        if reward == 0:
+            reward = self.get_reward()
+
+        return observation, reward, status, info
 
     # Visualizes the game
     def render(self):
         pass
 
     # Restarts the game
-    def reset(self):
+    def reset(self, state):
         time.sleep(1)
         pydirectinput.click(x=500, y=500)
         # needs different input for actual restart
+        # if state is timer runs out, press('esc')
+        # in all cases:
         pydirectinput.press('z')
+        pydirectinput.press('z')
+        # if state is victory (only after stage complete), press('up'), ('z'), ('z')
         return self.get_observation()
 
     def get_observation(self):
@@ -212,11 +230,14 @@ plt.show()
 
 """
 # input testing
-obs = env.reset()
-total_reward = 0
-for i in range(20):
-    obs, reward, info = env.step(env.action_space.sample())
-    total_reward += reward
+for episode in range(10):
+    obs = env.reset()
+    # game states: "RUN", "DEAD", "TIME", "COMPLETE"
+    game_state = "RUN"
+    total_reward = 0
+    for i in range(50):
+        obs, reward, info = env.step(env.action_space.sample())
+        total_reward += reward
 
 # reset keystrokes to avoid holding last action
 pydirectinput.press('z')
