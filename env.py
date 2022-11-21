@@ -232,20 +232,21 @@ env.get_time()
 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 plt.show()
 
-"""
+
 # input testing
+# game states: "RUN", "DEAD", "TIME", "COMPLETE", "VICTORY"
+game_state = "RUN"
 for episode in range(10):
-    game_state = "RUN"
     obs = env.reset(state=game_state)
-    # game states: "RUN", "DEAD", "TIME", "COMPLETE"
     total_reward = 0
-    for i in range(50):
-        obs, reward, info = env.step(env.action_space.sample())
+    while game_state == "RUN":
+        obs, reward, game_state, info = env.step(env.action_space.sample())
         total_reward += reward
+    print("Total reward for episode {} is {}".format(episode, total_reward))
 
 # reset keystrokes to avoid holding last action
 pydirectinput.press('z')
 pydirectinput.press('left')
 pydirectinput.press('right')
-print("Total reward is {}".format(total_reward))
-"""
+
+
