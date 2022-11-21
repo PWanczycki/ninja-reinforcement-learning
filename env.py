@@ -82,19 +82,23 @@ class NGame(Env):
         observation = self.get_observation()
         info = {}
         reward = 0
-        #if check_death() == True:
-        #    reward = -10
-        #    status = "DEAD"
-        #if reward == 0 and check_outoftime() == True:
-        #    reward = -100
-        #    status = "TIME"
-        #if reward == 0 check_level_complete() == True:
-        #    reward = 50
-        #    status = "LEVEL COMPLETE"
-        #    if check_victory() == True:
-        #        reward = 200
-        #        status = "VICTORY"
 
+        cur_time = self.get_time()
+
+        #Only check game state when the timer has not changed
+        if self.check_status(cur_time):
+            if self.check_death():
+                reward = reward-10
+                status = "DEAD"
+            elif self.check_gameover():
+                reward = reward-100
+                status = "GAME OVER"
+            elif self.check_level_complete():
+                reward = reward + 50
+                status = "LEVEL COMPLETE"
+                if self.check_victory():
+                    reward = reward + 200
+                    status = "VICTORY"
         if reward == 0:
             reward = self.get_reward()
 
@@ -175,9 +179,7 @@ class NGame(Env):
 
     def get_time(self):
         capture = pytesseract.image_to_string(np.array(self.cap.grab(self.time_location))[:, :, :3])
-        print(capture)
-
-        return 0;
+        return capture
 
     def check_status(self, prev):
         if prev == self.get_time():
@@ -216,6 +218,8 @@ class NGame(Env):
 env = NGame()
 img = env.get_observation()
 
+t = env.get_time()
+print(env.check_status(t))
 """
 # Status Checking
 env.check_death()
