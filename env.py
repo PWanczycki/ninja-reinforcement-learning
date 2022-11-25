@@ -115,11 +115,15 @@ class NGame(Env):
 
     # Restarts the game
     def reset(self, state):
+        # reset key presses to avoid unexpected behaviour
+        pydirectinput.keyUp('z')
+        pydirectinput.keyUp('left')
+        pydirectinput.keyUp('right')
+
+        # select window and reset based on state
         time.sleep(1)
         pydirectinput.click(x=500, y=500)
-        # needs different input for actual restart
-        # if state is timer runs out, press('esc')
-        # in all cases:
+
         if state == "DEAD" or state == "LEVEL COMPLETE":
             pydirectinput.press('z')
         if state == "GAME OVER":
@@ -131,7 +135,6 @@ class NGame(Env):
             pydirectinput.press('up')
             pydirectinput.press('z')
             pydirectinput.press('z')
-        # if state is victory (only after stage complete), press('up'), ('z'), ('z')
         return self.get_observation()
 
     def get_observation(self):
