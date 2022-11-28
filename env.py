@@ -126,6 +126,7 @@ class NGame(Env):
         pydirectinput.click()
         time.sleep(1)
         pydirectinput.press('z')
+        pydirectinput.moveTo(x=200, y=60)
 
         return self.get_observation()
 
