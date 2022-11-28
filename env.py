@@ -22,7 +22,7 @@ class NGame(Env):
     def __init__(self):
         super().__init__()
         # setup spaces
-        self.observation_space = Box(low=0, high=255, shape=(1, 83, 100), dtype=np.uint8)
+        self.observation_space = Box(low=0, high=255, shape=(1, 200, 300), dtype=np.uint8)
         # 5 actions: 0 = jump, 1 = left, 2 = right, 3 = jump+left, 4 = jump+right, 5 = no action
         self.action_space = Discrete(6)
         # Define extraction parameters for the game
@@ -132,16 +132,16 @@ class NGame(Env):
 
     def get_observation(self):
         # Get the screen capture of the game
-        raw = np.array(self.cap.grab(self.time_location))[:, :, :3]
+        raw = np.array(self.cap.grab(self.game_location))[:, :, :3]
         # Greyscale
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
 
         # Resize
-        resized = cv2.resize(gray, (100, 83))
+        resized = cv2.resize(gray, (300, 200))
 
         # Add channels first
-        channel = np.reshape(resized, (1, 83, 100))
-        return raw
+        channel = np.reshape(resized, (1, 200,300))
+        return channel
 
     def close_observation(self):
         pass
@@ -225,24 +225,28 @@ class NGame(Env):
         return -7
 
 
+"""
+env = NGame()
+img = env.get_observation()
+
+plt.imshow(cv2.cvtColor(env.get_observation()[0],cv2.COLOR_BGR2RGB))
+plt.show()
+
 env = NGame()
 img = env.get_observation()
 
 t = env.get_time()
 print(env.check_status(t))
-"""
+
 # Status Checking
 env.check_death()
 env.check_gameover()
 env.check_level_complete()
 env.check_victory()
-"""
 env.get_time()
 
-#plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-#plt.show()
-
-
+plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+plt.show()
 # input testing
 # game states: "RUN", "DEAD", "TIME", "COMPLETE", "VICTORY"
 game_state = "RUN"
@@ -259,5 +263,8 @@ for episode in range(3):
 pydirectinput.press('z')
 pydirectinput.press('left')
 pydirectinput.press('right')
+
+"""
+
 
 
