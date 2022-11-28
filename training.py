@@ -40,11 +40,12 @@ class TrainAndLoggingCallback(BaseCallback):
 CHECKPOINT_DIR = './train/'
 LOG_DIR = './logs/'
 
-callback = TrainAndLoggingCallback(check_freq=100, save_path=CHECKPOINT_DIR)
+callback = TrainAndLoggingCallback(check_freq=500, save_path=CHECKPOINT_DIR)
 
-model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=80000, learning_starts=100)
+model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=1000, learning_starts=500)
 
-model.learn(total_timesteps=10000, callback=callback)
+model.learn(total_timesteps=20000, callback=callback)
+
 
 """
 plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
