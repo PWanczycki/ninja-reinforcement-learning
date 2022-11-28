@@ -24,7 +24,7 @@ class TrainAndLoggingCallback(BaseCallback):
     def __init__(self, check_freq, save_path, verbose=1):
         super(TrainAndLoggingCallback, self).__init__(verbose)
         self.check_freq = check_freq
-        self.save_path = save_pathz
+        self.save_path = save_path
     def _init_callback(self):
         if self.save_path is not None:
             os.makedirs(self.save_path, exist_ok=True)
@@ -40,9 +40,9 @@ class TrainAndLoggingCallback(BaseCallback):
 CHECKPOINT_DIR = './train/'
 LOG_DIR = './logs/'
 
-callback = TrainAndLoggingCallback(check_freq=1000, save_path=CHECKPOINT_DIR)
+callback = TrainAndLoggingCallback(check_freq=100, save_path=CHECKPOINT_DIR)
 
-model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=1200000, learning_starts=1000)
+model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=80000, learning_starts=100)
 
 model.learn(total_timesteps=10000, callback=callback)
 
