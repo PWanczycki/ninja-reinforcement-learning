@@ -114,27 +114,19 @@ class NGame(Env):
         pass
 
     # Restarts the game
-    def reset(self, state):
+    def reset(self):
         # reset key presses to avoid unexpected behaviour
         pydirectinput.keyUp('z')
         pydirectinput.keyUp('left')
         pydirectinput.keyUp('right')
 
-        # select window and reset based on state
+        pydirectinput.press('z')
         time.sleep(1)
-        pydirectinput.click(x=500, y=500)
+        pydirectinput.moveTo(x=460 + 90, y=135 + 185)
+        pydirectinput.click()
+        time.sleep(1)
+        pydirectinput.press('z')
 
-        if state == "DEAD" or state == "LEVEL COMPLETE":
-            pydirectinput.press('z')
-        if state == "GAME OVER":
-            pydirectinput.press('z')
-            pydirectinput.press('z')
-            pydirectinput.press('z')
-        if state == "VICTORY":
-            pydirectinput.press('z')
-            pydirectinput.press('up')
-            pydirectinput.press('z')
-            pydirectinput.press('z')
         return self.get_observation()
 
     def get_observation(self):
@@ -254,7 +246,7 @@ env.get_time()
 # game states: "RUN", "DEAD", "TIME", "COMPLETE", "VICTORY"
 game_state = "RUN"
 for episode in range(3):
-    obs = env.reset(state=game_state)
+    obs = env.reset()
     game_state = "RUN"
     total_reward = 0
     while game_state == "RUN":
