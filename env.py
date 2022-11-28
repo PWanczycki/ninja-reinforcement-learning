@@ -78,7 +78,7 @@ class NGame(Env):
                 pydirectinput.keyUp('left')
                 pydirectinput.keyUp('right')
 
-        status = "RUN"
+        reset = False
         observation = self.get_observation()
         info = {}
         reward = 0
@@ -89,25 +89,25 @@ class NGame(Env):
         if self.check_status(cur_time):
             if self.check_death():
                 reward = reward-10
-                status = "DEAD"
+                reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
                 if self.check_gameover():
                     reward = reward-100
-                    status = "GAME OVER"
+                    reset = True
             elif self.check_level_complete():
                 reward = reward + 50
-                status = "LEVEL COMPLETE"
+                reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
                 if self.check_victory():
                     reward = reward + 200
-                    status = "VICTORY"
+                    reset = True
         # if status check does not give reward
         if reward == 0:
             reward = self.get_reward()
 
-        return observation, reward, status, info
+        return observation, reward, reset, info
 
     # Visualizes the game
     def render(self):
