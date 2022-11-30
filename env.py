@@ -92,17 +92,17 @@ class NGame(Env):
                 reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
-                if self.check_gameover():
+                if self.check_episode_exit():
                     reward = reward-100
-                    reset = True
+
             elif self.check_level_complete():
                 reward = reward + 50
                 reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
-                if self.check_victory():
+                if self.check_episode_exit():
                     reward = reward + 200
-                    reset = True
+
         # if status check does not give reward
         if reward == 0:
             reward = self.get_reward()
@@ -117,16 +117,16 @@ class NGame(Env):
     def reset(self):
         # reset key presses to avoid unexpected behaviour
         pydirectinput.keyUp('z')
-        pydirectinput.keyUp('left')
-        pydirectinput.keyUp('right')
+        pydirectinput.press('left')
+        pydirectinput.press('right')
 
         pydirectinput.press('z')
         time.sleep(1)
-        pydirectinput.moveTo(x=460 + 90, y=135 + 185)
+        pydirectinput.moveTo(x=460 + 60, y=135 + 120)
         pydirectinput.click()
         time.sleep(1)
         pydirectinput.press('z')
-        pydirectinput.moveTo(x=200, y=60)
+        pydirectinput.moveTo(x=60, y=60)
 
         return self.get_observation()
 
@@ -143,7 +143,7 @@ class NGame(Env):
         channel = np.reshape(resized, (1, 200,300))
         return channel
 
-    def close_observation(self):
+    def close(self):
         pass
 
     def check_death(self):
@@ -187,6 +187,18 @@ class NGame(Env):
             status = True
         return status
 
+    def check_episode_exit(self):
+        # alternate check for "Victory" and "Game Over"
+        # check if timer is still shown by extracting 1 row of pixels and checking for non-bg colour (gray)
+        timer = np.array(self.cap.grab({'top': 179, 'left': 510, 'width': 44, 'height': 1}))[:, :, :3].tolist()
+
+        for i in range(44):
+            if timer[0][i] != [136, 121, 121]:
+                return False
+
+        # all pixels were gray, timer is no longer shown and game will exit episode
+        return True
+
     def get_time(self):
         capture = pytesseract.image_to_string(np.array(self.cap.grab(self.time_location))[:, :, :3])
         return capture
@@ -199,7 +211,7 @@ class NGame(Env):
 
     def get_reward(self):
         # grab timer screenshot
-        timer = np.array(self.cap.grab(self.timerbar_location))[:, :, :3].tolist()
+        timerbar = np.array(self.cap.grab(self.timerbar_location))[:, :, :3].tolist()
 
         PURPLE = [136, 34, 34]
         GRAY = [136, 121, 121]
@@ -212,13 +224,13 @@ class NGame(Env):
 
         # check for timer <= 180
         for i in range(13):
-            if timer[0][i * 60 + 30] == GRAY:
+            if timerbar[0][i * 60 + 30] == GRAY:
                 return i - 6
 
         # check for timer > 180
         for i in range(13):
             # if pixel i*60+30 is purple, return i+7
-            if timer[0][i * 60 + 30] == PURPLE:
+            if timerbar[0][i * 60 + 30] == PURPLE:
                 return i + 7
 
         # default negative reward if timer messes up
