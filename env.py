@@ -22,7 +22,7 @@ class NGame(Env):
     def __init__(self):
         super().__init__()
         # setup spaces
-        self.observation_space = Box(low=0, high=255, shape=(1, 200, 300), dtype=np.uint8)
+        self.observation_space = Box(low=0, high=255, shape=(1, 400, 500), dtype=np.uint8)
         # 5 actions: 0 = jump, 1 = left, 2 = right, 3 = jump+left, 4 = jump+right, 5 = no action
         self.action_space = Discrete(6)
         # Define extraction parameters for the game
@@ -121,10 +121,10 @@ class NGame(Env):
         pydirectinput.press('right')
 
         pydirectinput.press('z')
-        time.sleep(1)
+        #time.sleep(1)
         pydirectinput.moveTo(x=460 + 60, y=135 + 120)
         pydirectinput.click()
-        time.sleep(1)
+        #time.sleep(1)
         pydirectinput.press('z')
         pydirectinput.moveTo(x=60, y=60)
 
@@ -137,10 +137,10 @@ class NGame(Env):
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
 
         # Resize
-        resized = cv2.resize(gray, (300, 200))
+        resized = cv2.resize(gray, (500, 400))
 
         # Add channels first
-        channel = np.reshape(resized, (1, 200,300))
+        channel = np.reshape(resized, (1, 400, 500))
         return channel
 
     def close(self):
