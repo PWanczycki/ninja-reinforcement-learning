@@ -216,25 +216,24 @@ class NGame(Env):
         PURPLE = [136, 34, 34]
         GRAY = [136, 121, 121]
 
-        # iterate twice through pixels 60 at a time, (13 positions/blocks)
-        # first iter, stop if middle of block is gray, 7th (middle) block -> reward = 0,
-        # -1 for each earlier block, +1 for each later (-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6)
+        # iterate twice through pixels 10 at a time, (78 positions/blocks)
+        # first iter, stop if middle of block is gray,
+        # each higher block gives +1 reward compared to previous one
         # second iter, stop if dark purple,
-        # same rewards as first iter, but +13 (7,8,9,...,18,19)
+        # same rewards as first iter, but +78
 
         # check for timer <= 180
-        for i in range(13):
-            if timerbar[0][i * 60 + 30] == GRAY:
-                return i - 6
+        for i in range(78):
+            if timerbar[0][i * 10 + 5] == GRAY:
+                return i - 38
 
         # check for timer > 180
-        for i in range(13):
-            # if pixel i*60+30 is purple, return i+7
-            if timerbar[0][i * 60 + 30] == PURPLE:
-                return i + 7
+        for i in range(78):
+            if timerbar[0][i * 10 + 5] == PURPLE:
+                return i + 40
 
-        # default negative reward if timer messes up
-        return -7
+        # default reward if timer messes up
+        return 0
 
 
 """
