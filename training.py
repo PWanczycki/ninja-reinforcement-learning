@@ -42,7 +42,7 @@ LOG_DIR = './logs/'
 
 callback = TrainAndLoggingCallback(check_freq=500, save_path=CHECKPOINT_DIR)
 
-model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=1000, learning_starts=500)
+model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=1000, learning_starts=500, gamma=0.8)
 
 model.learn(total_timesteps=20000, callback=callback)
 

@@ -88,24 +88,30 @@ class NGame(Env):
         #Only check game state when the timer has not changed
         if self.check_status(cur_time):
             if self.check_death():
-                reward = reward-10
+                reward = reward-100
                 reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
                 if self.check_episode_exit():
-                    reward = reward-100
+                    reward = reward-1000
 
             elif self.check_level_complete():
-                reward = reward + 50
+                reward = reward + 200
                 reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
                 if self.check_episode_exit():
-                    reward = reward + 200
+                    reward = reward + 2000
+
+        # alternate gameover check (force death if timerbar is too low)
+        if reward == 0 and self.get_time_left() < 5:
+            pydirectinput.press('k')
+            reset = True
+            reward -= 1100
 
         # if status check does not give reward
         if reward == 0:
-            reward = self.get_reward()
+            reward = 1
 
         return observation, reward, reset, info
 
@@ -121,10 +127,10 @@ class NGame(Env):
         pydirectinput.press('right')
 
         pydirectinput.press('z')
-        time.sleep(1)
-        pydirectinput.moveTo(x=460 + 60, y=135 + 120)
+        # time.sleep(1)
+        pydirectinput.moveTo(x=460 + 90, y=135 + 180)
         pydirectinput.click()
-        time.sleep(1)
+        # time.sleep(1)
         pydirectinput.press('z')
         pydirectinput.moveTo(x=60, y=60)
 
@@ -209,7 +215,7 @@ class NGame(Env):
         else:
             return False
 
-    def get_reward(self):
+    def get_time_left(self):
         # grab timer screenshot
         timerbar = np.array(self.cap.grab(self.timerbar_location))[:, :, :3].tolist()
 
@@ -217,24 +223,22 @@ class NGame(Env):
         GRAY = [136, 121, 121]
 
         # iterate twice through pixels 60 at a time, (13 positions/blocks)
-        # first iter, stop if middle of block is gray, 7th (middle) block -> reward = 0,
-        # -1 for each earlier block, +1 for each later (-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6)
-        # second iter, stop if dark purple,
-        # same rewards as first iter, but +13 (7,8,9,...,18,19)
+        # first iter, stop if middle of block is gray
+        # second iter, stop if dark purple
 
         # check for timer <= 180
-        for i in range(13):
-            if timerbar[0][i * 60 + 30] == GRAY:
-                return i - 6
+        for i in range(78):
+            if timerbar[0][i * 10 + 5] == GRAY:
+                return i
 
         # check for timer > 180
-        for i in range(13):
+        for i in range(78):
             # if pixel i*60+30 is purple, return i+7
-            if timerbar[0][i * 60 + 30] == PURPLE:
-                return i + 7
+            if timerbar[0][i * 10 + 5] == PURPLE:
+                return i + 78
 
         # default negative reward if timer messes up
-        return -7
+        return 0
 
 
 """
