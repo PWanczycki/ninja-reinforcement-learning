@@ -50,4 +50,18 @@ model.learn(total_timesteps=20000, callback=callback)
 """
 plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
 plt.show()
+
+model.load(filepath)
+
+for episode in range(5): 
+    obs = env.reset()
+    done = False
+    total_reward = 0
+    while not done: 
+        action, _ = model.predict(obs)
+        obs, reward, done, info = env.step(int(action))
+        time.sleep(0.01)
+        total_reward += reward
+    print('Total Reward for episode {} is {}'.format(episode, total_reward))
+    time.sleep(2)
 """
