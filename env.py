@@ -88,30 +88,26 @@ class NGame(Env):
         #Only check game state when the timer has not changed
         if self.check_status(cur_time):
             if self.check_death():
-                reward = reward-100
+                reward = -10
                 reset = True
                 pydirectinput.press('z')
                 time.sleep(1)
                 if self.check_episode_exit():
-                    reward = reward-1000
+                    reward = -100
 
             elif self.check_level_complete():
-                reward = reward + 200
+                reward = 500 + self.get_time_left()
                 reset = True
-                pydirectinput.press('z')
-                time.sleep(1)
-                if self.check_episode_exit():
-                    reward = reward + 2000
+                #pydirectinput.press('z')
+                #time.sleep(1)
+                #if self.check_episode_exit():
+                    #reward = reward + 2000
 
         # alternate gameover check (force death if timerbar is too low)
-        if reward == 0 and self.get_time_left() < 5:
+        if reward == 0 and self.get_time_left() < 3:
             pydirectinput.press('k')
             reset = True
-            reward -= 1100
-
-        # if status check does not give reward
-        if reward == 0:
-            reward = 1
+            reward = -100
 
         return observation, reward, reset, info
 
@@ -126,13 +122,14 @@ class NGame(Env):
         pydirectinput.press('left')
         pydirectinput.press('right')
 
-        pydirectinput.press('z')
+        # reset to first level of episode in all cases
+        pydirectinput.press('esc')
         # time.sleep(1)
-        pydirectinput.moveTo(x=460 + 90, y=135 + 180)
+        pydirectinput.moveTo(x=550+0*50, y=315)
         pydirectinput.click()
         # time.sleep(1)
         pydirectinput.press('z')
-        pydirectinput.moveTo(x=60, y=60)
+        #pydirectinput.moveTo(x=60, y=60)
 
         return self.get_observation()
 

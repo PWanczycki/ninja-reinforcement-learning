@@ -42,9 +42,11 @@ LOG_DIR = './logs/'
 
 callback = TrainAndLoggingCallback(check_freq=500, save_path=CHECKPOINT_DIR)
 
-model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=1000, learning_starts=500, gamma=0.8)
+model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=4000, learning_starts=500, gamma=0.8, learning_rate=0.01)
 
-model.learn(total_timesteps=20000, callback=callback)
+model.load('../train4_nosteprew_gamma.8_alpha.01/best_model_5000.zip')
+
+model.learn(total_timesteps=30000, callback=callback)
 
 
 """
