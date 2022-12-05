@@ -28,7 +28,7 @@ class NGame(Env):
         # Define extraction parameters for the game
         self.cap = mss()
         # Captures the game state
-        self.game_location = {'top': 135, 'left': 460, 'width': 983, 'height': 800}
+        self.game_location = {'top': 600, 'left': 488, 'width': 520, 'height': 290}
 
         # Get the death message, 'ouch...'
         self.death_location = {'top': 290, 'left': 878, 'width': 40, 'height': 20}
@@ -135,7 +135,7 @@ class NGame(Env):
 
     def get_observation(self):
         # Get the screen capture of the game
-        raw = np.array(self.cap.grab(self.game_over_location))[:, :, :3]
+        raw = np.array(self.cap.grab(self.game_location))[:, :, :3]
         # Greyscale
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
 
@@ -144,7 +144,7 @@ class NGame(Env):
 
         # Add channels first
         channel = np.reshape(resized, (1, 200,300))
-        return raw
+        return channel
 
     def close(self):
         pass
@@ -237,12 +237,6 @@ class NGame(Env):
 
         # default negative reward if timer messes up
         return 0
-
-env = NGame()
-img = env.get_observation()
-env.check_victory()
-plt.imshow(cv2.cvtColor(env.get_observation(),cv2.COLOR_BGR2RGB))
-plt.show()
 
 """
 env = NGame()
