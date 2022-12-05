@@ -37,11 +37,13 @@ class NGame(Env):
         # Get the complete level message, 'level'
         self.level_complete_location = {'top': 284, 'left': 851, 'width': 57, 'height': 30}
         # Get the victory message, episode is completed
-        self.victory_location = {'top': 369, 'left': 709, 'width': 50, 'height': 20}
+        self.victory_location = {'top': 395, 'left': 709, 'width': 60, 'height': 1}
         # Get the level timer bar
         self.timerbar_location = {'top': 135 + 45, 'left': 460 + 110, 'width': 780, 'height': 1}
         # Get the level timer number
         self.time_location = {'top': 160, 'left': 500, 'width': 65, 'height': 45}
+
+        self.last_time_left = 0
 
     # What is called to perform an action in the game
     def step(self, action):
@@ -87,28 +89,24 @@ class NGame(Env):
 
         #Only check game state when the timer has not changed
         if self.check_status(cur_time):
-            if self.check_death():
-                reward = -10
+            if self.check_victory():
+                reward = 500 + self.last_time_left
                 reset = True
-                pydirectinput.press('z')
-                time.sleep(1)
-                if self.check_episode_exit():
-                    reward = -100
+                print("victory")
+            else:
+                reward = -20 + self.last_time_left // 10
+                reset = True
+                print("death")
 
-            elif self.check_level_complete():
-                reward = 500 + self.get_time_left()
-                reset = True
-                #pydirectinput.press('z')
-                #time.sleep(1)
-                #if self.check_episode_exit():
-                    #reward = reward + 2000
 
         # alternate gameover check (force death if timerbar is too low)
-        if reward == 0 and self.get_time_left() < 3:
+        if reward == 0 and self.last_time_left < 3:
             pydirectinput.press('k')
             reset = True
             reward = -100
+            print("gameover")
 
+        self.last_time_left = self.get_time_left()
         return observation, reward, reset, info
 
     # Visualizes the game
@@ -149,59 +147,15 @@ class NGame(Env):
     def close(self):
         pass
 
-    def check_death(self):
-        # Check if the agent is dead
-        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.death_location))[:, :, :3])[:4]
-        strings = ['ouch', 'oucn']
-
-        status = False
-        if capture in strings:
-            print("Agent has died")
-            status = True
-        return status
-
-    def check_gameover(self):
-        # Check if the run is over, no more in game time
-        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.game_over_location))[:, :, :3])[:5]
-        strings = ['Gomme', 'Gorne']
-        status = False
-        if capture in strings:
-            print("Game Over!")
-            status = True
-        return status
-
-    def check_level_complete(self):
-        # Check if the level has been beaten
-        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.level_complete_location))[:, :, :3])[:5]
-        strings = ['level', 'laval']
-        status = False
-        if capture in strings:
-            print("Level Complete!")
-            status = True
-        return status
-
     def check_victory(self):
         # Check if the episode has been beaten, victory screen
-        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.game_over_location))[:, :, :3])[:7]
-        strings = ['VICTORY']
-        print(capture)
-        status = False
-        if capture in strings:
-            print("Episode Complete!")
-            status = True
-        return status
+        pixels_under_VICTORY = np.array(self.cap.grab(self.victory_location))[:, :, :3].tolist()
 
-    def check_episode_exit(self):
-        # alternate check for "Victory" and "Game Over"
-        # check if timer is still shown by extracting 1 row of pixels and checking for non-bg colour (gray)
-        timer = np.array(self.cap.grab({'top': 179, 'left': 510, 'width': 44, 'height': 1}))[:, :, :3].tolist()
-
-        for i in range(44):
-            if timer[0][i] != [136, 121, 121]:
-                return False
-
-        # all pixels were gray, timer is no longer shown and game will exit episode
-        return True
+        for pixel in pixels_under_VICTORY[0]:
+            #print(pixel)
+            if pixel != [208, 202, 202]:
+                return True
+        return False
 
     def get_time(self):
         capture = pytesseract.image_to_string(np.array(self.cap.grab(self.time_location))[:, :, :3])
