@@ -43,7 +43,7 @@ class NGame(Env):
         # Get the level timer number
         self.time_location = {'top': 160, 'left': 500, 'width': 65, 'height': 45}
 
-        self.last_time_left = 0
+        self.last_time_left = [39, 39]
 
     # What is called to perform an action in the game
     def step(self, action):
@@ -84,29 +84,31 @@ class NGame(Env):
         observation = self.get_observation()
         info = {}
         reward = 0
+        self.last_time_left[0] = self.last_time_left[1]
+        self.last_time_left[1] = self.get_time_left()
 
-        cur_time = self.get_time()
+        #cur_time = self.get_time()
 
         #Only check game state when the timer has not changed
-        if self.check_status(cur_time):
+        if self.check_episode_exit():
+            time.sleep(1)
             if self.check_victory():
-                reward = 500 + self.last_time_left
+                reward = 500 + self.last_time_left[0]
                 reset = True
                 print("victory")
             else:
-                reward = -20 + self.last_time_left // 10
+                reward = -20 + self.last_time_left[0] // 10
                 reset = True
                 print("death")
 
 
         # alternate gameover check (force death if timerbar is too low)
-        if reward == 0 and self.last_time_left < 3:
+        if reward == 0 and self.last_time_left[0] < 3:
             pydirectinput.press('k')
             reset = True
             reward = -100
             print("gameover")
 
-        self.last_time_left = self.get_time_left()
         return observation, reward, reset, info
 
     # Visualizes the game
@@ -116,18 +118,9 @@ class NGame(Env):
     # Restarts the game
     def reset(self):
         # reset key presses to avoid unexpected behaviour
-        pydirectinput.keyUp('z')
-        pydirectinput.press('left')
-        pydirectinput.press('right')
-
-        # reset to first level of episode in all cases
-        pydirectinput.press('esc')
-        # time.sleep(1)
-        pydirectinput.moveTo(x=550+0*50, y=315)
-        pydirectinput.click()
-        # time.sleep(1)
+        self.last_time_left = [39, 39]
         pydirectinput.press('z')
-        #pydirectinput.moveTo(x=60, y=60)
+        pydirectinput.press('z')
 
         return self.get_observation()
 
@@ -153,7 +146,7 @@ class NGame(Env):
 
         for pixel in pixels_under_VICTORY[0]:
             #print(pixel)
-            if pixel != [208, 202, 202]:
+            if pixel != [208, 202, 202] and pixel != [136, 121, 121]:
                 return True
         return False
 
@@ -166,6 +159,18 @@ class NGame(Env):
             return True
         else:
             return False
+
+    def check_episode_exit(self):
+        # alternate check for "Victory" and "Game Over"
+        # check if timer is still shown by extracting 1 row of pixels and checking for non-bg colour (gray)
+        timer = np.array(self.cap.grab({'top': 179, 'left': 510, 'width': 44, 'height': 1}))[:, :, :3].tolist()
+
+        for i in range(44):
+            if timer[0][i] != [136, 121, 121]:
+                return False
+
+        # all pixels were gray, timer is no longer shown and game will exit episode
+        return True
 
     def get_time_left(self):
         # grab timer screenshot
