@@ -37,7 +37,7 @@ class NGame(Env):
         # Get the complete level message, 'level'
         self.level_complete_location = {'top': 284, 'left': 851, 'width': 57, 'height': 30}
         # Get the victory message, episode is completed
-        self.victory_location = {'top': 371, 'left': 695, 'width': 51, 'height': 11}
+        self.victory_location = {'top': 369, 'left': 709, 'width': 50, 'height': 20}
         # Get the level timer bar
         self.timerbar_location = {'top': 135 + 45, 'left': 460 + 110, 'width': 780, 'height': 1}
         # Get the level timer number
@@ -135,7 +135,7 @@ class NGame(Env):
 
     def get_observation(self):
         # Get the screen capture of the game
-        raw = np.array(self.cap.grab(self.game_location))[:, :, :3]
+        raw = np.array(self.cap.grab(self.game_over_location))[:, :, :3]
         # Greyscale
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
 
@@ -144,7 +144,7 @@ class NGame(Env):
 
         # Add channels first
         channel = np.reshape(resized, (1, 200,300))
-        return channel
+        return raw
 
     def close(self):
         pass
@@ -182,8 +182,9 @@ class NGame(Env):
 
     def check_victory(self):
         # Check if the episode has been beaten, victory screen
-        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.victory_location))[:, :, :3])[:7]
+        capture = pytesseract.image_to_string(np.array(self.cap.grab(self.game_over_location))[:, :, :3])[:7]
         strings = ['VICTORY']
+        print(capture)
         status = False
         if capture in strings:
             print("Episode Complete!")
@@ -237,6 +238,11 @@ class NGame(Env):
         # default negative reward if timer messes up
         return 0
 
+env = NGame()
+img = env.get_observation()
+env.check_victory()
+plt.imshow(cv2.cvtColor(env.get_observation(),cv2.COLOR_BGR2RGB))
+plt.show()
 
 """
 env = NGame()
