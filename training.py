@@ -13,6 +13,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 
 import cv2
 from matplotlib import pyplot as plt
+import time
 
 
 env = game_env.NGame()
@@ -42,18 +43,14 @@ LOG_DIR = './logs/'
 
 callback = TrainAndLoggingCallback(check_freq=500, save_path=CHECKPOINT_DIR)
 
-model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=4000, learning_starts=500, exploration_fraction=0.9, exploration_final_eps=0.3)
+#model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=4000, learning_starts=500, exploration_fraction=0.9, exploration_final_eps=0.3)
 
-#model.load('../train4_nosteprew_gamma.8_alpha.01/best_model_5000.zip')
+model = DQN.load('../train7_sameas6butvardeathrew_customlvl/best_model_30000', env)
 
-model.learn(total_timesteps=30000, callback=callback)
+#model.learn(total_timesteps=30000, callback=callback)
 
 
-"""
-plt.imshow(cv2.cvtColor(env.get_observation(), cv2.COLOR_BGR2RGB))
-plt.show()
-
-model.load(filepath)
+#"""
 
 for episode in range(5): 
     obs = env.reset()
@@ -61,9 +58,10 @@ for episode in range(5):
     total_reward = 0
     while not done: 
         action, _ = model.predict(obs)
+        print(action)
         obs, reward, done, info = env.step(int(action))
         time.sleep(0.01)
         total_reward += reward
     print('Total Reward for episode {} is {}'.format(episode, total_reward))
     time.sleep(2)
-"""
+#"""
