@@ -118,6 +118,9 @@ class NGame(Env):
     # Restarts the game
     def reset(self):
         # reset key presses to avoid unexpected behaviour
+        pydirectinput.keyUp('left')
+        pydirectinput.keyUp('right')
+
         self.last_time_left = [39, 39]
         pydirectinput.press('z')
         pydirectinput.press('z')
