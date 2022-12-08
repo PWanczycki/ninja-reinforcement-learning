@@ -43,25 +43,38 @@ LOG_DIR = './logs/'
 
 callback = TrainAndLoggingCallback(check_freq=500, save_path=CHECKPOINT_DIR)
 
-#model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=4000, learning_starts=500, exploration_fraction=0.9, exploration_final_eps=0.3)
+#model = DQN('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, buffer_size=4000, learning_starts=500)
 
-model = DQN.load('../train7_sameas6butvardeathrew_customlvl/best_model_30000', env)
+#model = DQN.load('../train7_sameas6butvardeathrew_customlvl/best_model_30000', env)
 
 #model.learn(total_timesteps=30000, callback=callback)
 
 
 #"""
+models = [#'../first training/best_model_50000',
+          #'../train2_gamma.6/best_model_42500',
+          #'../train3_onlyposrew/best_model_50000',
+          '../train4_nosteprew_gamma.8_alpha.01_50/best_model_50000',
+          '../train5from4_00/best_model_30000',
+          '../train6_nosteprew_g1_a.01_highexp_00/best_model_30000',
+          '../train7_sameas6butvardeathrew_customlvl/best_model_30000']
 
-for episode in range(5): 
-    obs = env.reset()
-    done = False
-    total_reward = 0
-    while not done: 
-        action, _ = model.predict(obs)
-        print(action)
-        obs, reward, done, info = env.step(int(action))
-        time.sleep(0.01)
-        total_reward += reward
-    print('Total Reward for episode {} is {}'.format(episode, total_reward))
-    time.sleep(2)
+for path in models:
+    time.sleep(3)
+    model = DQN.load(path, env)
+    avg_rew = 0.0
+    for episode in range(50):
+        obs = env.reset()
+        done = False
+        total_reward = 0
+        while not done:
+            action, _ = model.predict(obs)
+            # print(action)
+            obs, reward, done, info = env.step(int(action))
+            # time.sleep(0.01)
+            total_reward += reward
+        print('Total Reward for episode {} is {}'.format(episode, total_reward))
+        avg_rew += float(total_reward)
+        time.sleep(2)
+    print("Average reward for model {} was {}".format(path, avg_rew/50))
 #"""
