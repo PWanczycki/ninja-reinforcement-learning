@@ -10,7 +10,7 @@ cloudpickle==2.2.0
 colorama==0.4.6
 contourpy==1.0.6
 cycler==0.11.0
-fonttools==4.38.0
+fonttools==4.43.0
 google-auth==2.14.0
 google-auth-oauthlib==0.4.6
 grpcio==1.53.2
